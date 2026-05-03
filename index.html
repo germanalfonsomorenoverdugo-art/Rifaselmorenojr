@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Rifas El Moreno Jr</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+}
+
+/* HEADER MARCA */
+.brand-header {
+    background: #020617;
+    padding: 25px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-marca {
+    width: 120px;
+    height: auto;
+    margin-bottom: 10px;
+    animation: brillo 2s infinite ease-in-out;
+}
+
+.nombre-marca {
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+@keyframes brillo {
+    0% { filter: drop-shadow(0 0 5px #22c55e); }
+    50% { filter: drop-shadow(0 0 20px #22c55e); }
+    100% { filter: drop-shadow(0 0 5px #22c55e); }
+}
+
+/* INSTRUCCIONES */
+.instrucciones {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.rojo {
+    background: #ef4444;
+}
+
+.verde {
+    background: #22c55e;
+}
+
+/* CONTENIDO */
+.container {
+    padding: 20px;
+}
+
+.filtros input {
+    padding: 10px;
+    margin: 5px;
+    width: 120px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background: #22c55e;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 5px;
+}
+
+.boletos {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    max-width: 700px;
+    margin: auto;
+    margin-top: 20px;
+}
+
+.boleto {
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #1e293b;
+}
+
+.boleto:hover {
+    background: #334155;
+}
+
+.seleccionado {
+    background: #22c55e;
+    color: black;
+}
+
+.vendido {
+    background: #ef4444;
+    pointer-events: none;
+}
+
+.panel {
+    margin-top: 20px;
+}
+
+.resultado {
+    font-size: 22px;
+    margin-top: 10px;
+    color: #22c55e;
+}
+
+/* ANIMACIÓN MAQUINITA */
+@keyframes glow {
+    0% { box-shadow: 0 0 5px #22c55e; }
+    50% { box-shadow: 0 0 20px #22c55e; }
+    100% { box-shadow: 0 0 5px #22c55e; }
+}
+
+.animando {
+    animation: glow 0.5s infinite;
+}
+</style>
+</head>
+
+<body>
+
+<header class="brand-header">
+    <img src="flayer.jpeg" class="logo-marca">
+    <div class="nombre-marca">Rifas El Moreno Jr</div>
+</header>
+
+<div class="container">
+
+<h3>🎁 Premio: iPhone 17 Pro Max + accesorios</h3>
+<p>$200 MXN por boleto</p>
+
+<!-- INSTRUCCIONES -->
+<div class="instrucciones">
+    <div class="item">
+        <span class="color rojo"></span> Boleto vendido
+    </div>
+    <div class="item">
+        <span class="color verde"></span> Boleto seleccionado por ti
+    </div>
+</div>
+
+<div class="filtros">
+    <input type="number" id="buscar" placeholder="Buscar #">
+    <button onclick="buscarNumero()">Buscar</button>
+
+    <input type="number" id="termina" placeholder="Termina en">
+    <button onclick="filtrarTermina()">Filtrar</button>
+
+    <button onclick="reset()">Reset</button>
+</div>
+
+<button onclick="maquinita()">🎲 Maquinita de la Suerte</button>
+<div class="resultado" id="resultado"></div>
+
+<div class="boletos" id="boletos"></div>
+
+<div class="panel">
+    <h3>Seleccionados:</h3>
+    <p id="lista"></p>
+    <h3>Total: $<span id="total">0</span></h3>
+
+    <input id="nombre" placeholder="Nombre"><br><br>
+    <input id="telefono" placeholder="Teléfono"><br><br>
+
+    <button onclick="comprar()">Comprar por WhatsApp</button>
+</div>
+
+</div>
+
+<script>
+let precio = 200;
+let seleccionados = [];
+
+// 🔴 EDITA AQUÍ LOS BOLETOS VENDIDOS
+let vendidos = [1,20,23,31,70,88];
+
+let contenedor = document.getElementById("boletos");
+
+function crearBoletos() {
+    contenedor.innerHTML = "";
+
+    for (let i = 1; i <= 250; i++) {
+        let div = document.createElement("div");
+        div.classList.add("boleto");
+        div.innerText = i;
+
+        if (vendidos.includes(i)) {
+            div.classList.add("vendido");
+        }
+
+        div.onclick = () => {
+            if (div.classList.contains("vendido")) return;
+
+            if (seleccionados.includes(i)) {
+                seleccionados = seleccionados.filter(n => n !== i);
+                div.classList.remove("seleccionado");
+            } else {
+                seleccionados.push(i);
+                div.classList.add("seleccionado");
+            }
+            actualizar();
+        };
+
+        contenedor.appendChild(div);
+    }
+}
+
+function actualizar() {
+    document.getElementById("lista").innerText = seleccionados.join(", ");
+    document.getElementById("total").innerText = seleccionados.length * precio;
+}
+
+function buscarNumero() {
+    let num = document.getElementById("buscar").value;
+    let todos = document.querySelectorAll(".boleto");
+
+    todos.forEach(b => {
+        b.style.display = (b.innerText == num || num === "") ? "block" : "none";
+    });
+}
+
+function filtrarTermina() {
+    let dig = document.getElementById("termina").value;
+    let todos = document.querySelectorAll(".boleto");
+
+    todos.forEach(b => {
+        b.style.display = b.innerText.endsWith(dig) ? "block" : "none";
+    });
+}
+
+function reset() {
+    document.querySelectorAll(".boleto").forEach(b => b.style.display = "block");
+}
+
+async function maquinita() {
+    let cantidad = prompt("¿Cuántos boletos quieres al azar?");
+    if (!cantidad || cantidad <= 0) return;
+
+    let todos = document.querySelectorAll(".boleto");
+
+    let disponibles = [];
+    for (let i = 1; i <= 250; i++) {
+        if (!vendidos.includes(i) && !seleccionados.includes(i)) {
+            disponibles.push(i);
+        }
+    }
+
+    if (disponibles.length === 0) {
+        alert("No hay boletos disponibles");
+        return;
+    }
+
+    document.getElementById("resultado").innerText = "🎰 Girando...";
+
+    for (let c = 0; c < cantidad; c++) {
+
+        let vueltas = 20;
+
+        for (let i = 0; i < vueltas; i++) {
+            let random = disponibles[Math.floor(Math.random() * disponibles.length)];
+
+            todos.forEach(b => {
+                b.classList.remove("animando");
+                if (parseInt(b.innerText) === random) {
+                    b.classList.add("animando");
+                }
+            });
+
+            await new Promise(r => setTimeout(r, 50 + (i * 5)));
+        }
+
+        let elegido = disponibles[Math.floor(Math.random() * disponibles.length)];
+        seleccionados.push(elegido);
+
+        todos.forEach(b => {
+            b.classList.remove("animando");
+            if (parseInt(b.innerText) === elegido) {
+                b.classList.add("seleccionado");
+            }
+        });
+
+        disponibles = disponibles.filter(n => n !== elegido);
+
+        await new Promise(r => setTimeout(r, 300));
+    }
+
+    actualizar();
+    document.getElementById("resultado").innerText = "🎉 Boletos elegidos automáticamente";
+}
+
+function comprar() {
+    let nombre = document.getElementById("nombre").value;
+    let telefono = document.getElementById("telefono").value;
+
+    if (!nombre || !telefono || seleccionados.length === 0) {
+        alert("Completa todos los datos");
+        return;
+    }
+
+    let total = seleccionados.length * precio;
+
+    let mensaje = `Hola, quiero comprar boletos 🎟️
+
+Nombre: ${nombre}
+Teléfono: ${telefono}
+
+Boletos: ${seleccionados.join(", ")}
+Total: $${total} MXN
+
+Rifa: iPhone 17 Pro Max + accesorios`;
+
+    let numero = "5216221096287";
+
+    window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`);
+}
+
+crearBoletos();
+</script>
+
+</body>
+</html>
